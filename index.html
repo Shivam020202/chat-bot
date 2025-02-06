@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #1976D2, #2196F3);
+            color: white;
+            padding: 1.25rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-header-icon {
+            width: 2rem;
+            height: 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 1rem;
+            border-radius: 1rem;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message.with-options {
+            padding-bottom: 0.5rem;
+        }
+
+        .bot-message {
+            background: #f0f2f5;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .user-message {
+            background: #2196F3;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .option-btn {
+            background: none;
+            border: 1px solid #2196F3;
+            color: #2196F3;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .option-btn.selected {
+            background: #2196F3;
+            color: white;
+        }
+
+        .package-details {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .medicine-item {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 0.75rem;
+        }
+
+        .medicine-item h4 {
+            color: #1976D2;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin: 1rem 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn {
+            background: #2196F3;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: #1976D2;
+        }
+
+        .restart-btn {
+            background: #f0f2f5;
+            color: #2196F3;
+        }
+
+        .restart-btn:hover {
+            background: #e3e6e9;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            align-self: flex-start;
+        }
+
+        .typing-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: #90caf9;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 200ms;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 300ms;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 400ms;
+        }
+
+        @keyframes typing {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-0.5rem);
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .message {
+                max-width: 90%;
+                font-size: 0.9rem;
+            }
+
+            .option-btn {
+                padding: 0.875rem;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1a1a1a;
+            }
+
+            .chat-container {
+                background: #2d2d2d;
+            }
+
+            .bot-message {
+                background: #3d3d3d;
+                color: #fff;
+            }
+
+            .message-time {
+                color: #aaa;
+            }
+
+            .option-btn {
+                background: #3d3d3d;
+                border-color: #90caf9;
+                color: #90caf9;
+            }
+
+            .option-btn:hover,
+            .option-btn.selected {
+                background: #90caf9;
+                color: #2d2d2d;
+            }
+
+            .form-group input {
+                background: #3d3d3d;
+                border-color: #4d4d4d;
+                color: #fff;
+            }
+
+            .form-group label {
+                color: #aaa;
+            }
+
+            .package-details {
+                background: #3d3d3d;
+                border-color: #4d4d4d;
+            }
+
+            .medicine-item {
+                background: #454545;
+            }
+
+            .medicine-item h4 {
+                color: #90caf9;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18" />
+                </svg>
+            </div>
+            HealthCare Assistant
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+    </div>
+
+    <script>
+        const chatbotData = {
+            "categories": {
+                "Skin Concerns": {
+                    "Acne": {
+                        "questions": [
+                            {
+                                "text": "How would you describe your acne severity?",
+                                "options": [
+                                    { "text": "Mild - Few occasional pimples", "score": 1 },
+                                    { "text": "Moderate - Frequent breakouts", "score": 2 },
+                                    { "text": "Severe - Cystic acne", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "Which symptoms are you experiencing? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Oily Skin", "score": 1 },
+                                    { "text": "Blackheads/Whiteheads", "score": 1 },
+                                    { "text": "Redness & Inflammation", "score": 1 },
+                                    { "text": "Scarring", "score": 2 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-3": {
+                                "name": "Essential Acne Care Package",
+                                "medicines": [
+                                    {
+                                        "name": "Benzoyl Peroxide Cleanser 5%",
+                                        "usage": "Use once daily in the evening",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Salicylic Acid Toner 2%",
+                                        "usage": "Apply twice daily after cleansing",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "4-5": {
+                                "name": "Advanced Acne Treatment Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Adapalene Gel 0.1%",
+                                        "usage": "Apply a thin layer at night",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Clindamycin Solution 1%",
+                                        "usage": "Apply twice daily on affected areas",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Niacinamide Serum 10%",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "6+": {
+                                "name": "Professional Dermatological Package",
+                                "medicines": [
+                                    {
+                                        "name": "Tretinoin Cream 0.025%",
+                                        "usage": "Apply a small amount at night",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Azelaic Acid 15%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Benzoyl Peroxide Gel 2.5%",
+                                        "usage": "Use as spot treatment",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "Hair Concerns": {
+                    "Dandruff": {
+                        "questions": [
+                            {
+                                "text": "How frequently do you experience scalp flaking?",
+                                "options": [
+                                    { "text": "Occasionally - Once in a while", "score": 1 },
+                                    { "text": "Frequently - Weekly episodes", "score": 2 },
+                                    { "text": "Constantly - Daily occurrence", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "Which additional symptoms are you experiencing? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Itchy Scalp", "score": 1 },
+                                    { "text": "Red Patches", "score": 2 },
+                                    { "text": "Oily Scalp", "score": 1 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Basic Anti-Dandruff Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Ketoconazole Shampoo 1%",
+                                        "usage": "Use 2-3 times per week",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Tea Tree Scalp Treatment",
+                                        "usage": "Apply to scalp twice weekly",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Scalp Care Package",
+                                "medicines": [
+                                    {
+                                        "name": "Selenium Sulfide Shampoo 2.5%",
+                                        "usage": "Use 2-3 times per week",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Salicylic Acid Scalp Solution",
+                                        "usage": "Apply daily to affected areas",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Scalp Treatment Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Ketoconazole Shampoo 2%",
+                                        "usage": "Use 2-3 times per week",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Clobetasol Scalp Solution 0.05%",
+                                        "usage": "Apply twice daily to affected areas",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Zinc Pyrithione Shampoo",
+                                        "usage": "Alternate with medicated shampoo",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        class ChatBot {
+            constructor() {
+                this.state = {
+                    currentCategory: null,
+                    currentConcern: null,
+                    currentQuestion: 0,
+                    selections: [],
+                    score: 0,
+                    recommendedPackage: null,
+                    conversation: []
+                };
+                this.init();
+            }
+
+            init() {
+                this.showWelcomeMessage();
+                setTimeout(() => this.showCategories(), 1000);
+            }
+
+            showWelcomeMessage() {
+                this.addMessage({
+                    type: 'bot',
+                    text: 'Hello! I\'m your HealthCare Assistant. I\'ll help you find the right treatment for your concerns.'
+                });
+            }
+
+            showCategories() {
+                const categories = Object.keys(chatbotData.categories);
+                this.addMessage({
+                    type: 'bot',
+                    text: 'Please select your primary health concern:',
+                    options: categories
+                });
+            }
+
+            handleCategorySelection(category) {
+                this.state.currentCategory = category;
+                const concerns = Object.keys(chatbotData.categories[category]);
+
+                this.addMessage({
+                    type: 'user',
+                    text: category
+                });
+
+                setTimeout(() => {
+                    this.addMessage({
+                        type: 'bot',
+                        text: `What specific ${category.toLowerCase()} concern would you like to address?`,
+                        options: concerns
+                    });
+                }, 500);
+            }
+
+            handleConcernSelection(concern) {
+                this.state.currentConcern = chatbotData.categories[this.state.currentCategory][concern];
+                this.state.currentQuestion = 0;
+
+                this.addMessage({
+                    type: 'user',
+                    text: concern
+                });
+
+                setTimeout(() => this.askNextQuestion(), 500);
+            }
+
+            askNextQuestion() {
+                const question = this.state.currentConcern.questions[this.state.currentQuestion];
+
+                this.addMessage({
+                    type: 'bot',
+                    text: question.text,
+                    options: question.options.map(opt => opt.text),
+                    multiple: question.multiple
+                });
+            }
+
+            handleAnswer(answer) {
+                const question = this.state.currentConcern.questions[this.state.currentQuestion];
+                const selectedOption = question.options.find(opt => opt.text === answer);
+
+                this.state.score += selectedOption.score;
+                this.state.selections.push(answer);
+
+                this.addMessage({
+                    type: 'user',
+                    text: answer
+                });
+
+                if (!question.multiple) {
+                    this.moveToNextQuestion();
+                }
+            }
+
+            moveToNextQuestion() {
+                this.state.currentQuestion++;
+
+                if (this.state.currentQuestion < this.state.currentConcern.questions.length) {
+                    setTimeout(() => this.askNextQuestion(), 500);
+                } else {
+                    setTimeout(() => this.showRecommendation(), 500);
+                }
+            }
+
+            showRecommendation() {
+                const packages = this.state.currentConcern.packages;
+                let recommendedPackage = null;
+
+                for (const [range, pkg] of Object.entries(packages)) {
+                    const [min, max] = range.split('-');
+                    const maxScore = max === '+' ? Infinity : Number(max);
+                    if (this.state.score >= Number(min) && this.state.score <= maxScore) {
+                        recommendedPackage = pkg;
+                        break;
+                    }
+                }
+
+                this.state.recommendedPackage = recommendedPackage;
+
+                // Show recommendation message with package details
+                const packageHTML = `
+                    <div class="package-details">
+                        <h3>${recommendedPackage.name}</h3>
+                        <p class="package-description">${recommendedPackage.description}</p>
+                        <div class="medicines">
+                            ${recommendedPackage.medicines.map(medicine => `
+                                <div class="medicine-item">
+                                    <h4>${medicine.name}</h4>
+                                    <p><strong>Usage:</strong> ${medicine.usage}</p>
+                                    <p><strong>Duration:</strong> ${medicine.duration}</p>
+                                    <p class="medicine-details">${medicine.details || ''}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p class="package-price"><strong>Package Price:</strong> ${recommendedPackage.price}</p>
+                    </div>
+                `;
+
+                this.addMessage({
+                    type: 'bot',
+                    text: 'Based on your responses, I recommend:',
+                    html: packageHTML
+                });
+
+                // Add a continue button to proceed to order form
+                this.addMessage({
+                    type: 'bot',
+                    text: 'Would you like to proceed with ordering this package?',
+                    options: ['Yes, proceed to order', 'No, start over']
+                });
+            }
+
+            showOrderForm() {
+                const formHTML = `
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Delivery Address</label>
+                        <input type="text" id="address" placeholder="Enter your delivery address" required>
+                    </div>
+                    <button class="action-btn submit-btn" onclick="chatBot.submitOrder()">Place Order</button>
+                    <button class="action-btn restart-btn" onclick="chatBot.restart()">Start New Consultation</button>
+                `;
+
+                this.addMessage({
+                    type: 'bot',
+                    text: 'Please provide your delivery information to complete your order:',
+                    html: formHTML
+                });
+            }
+
+            submitOrder() {
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const address = document.getElementById('address').value;
+
+                if (!name || !email || !phone || !address) {
+                    this.addMessage({
+                        type: 'bot',
+                        text: 'Please fill in all required fields to complete your order.'
+                    });
+                    return;
+                }
+
+                const order = {
+                    customer: { name, email, phone, address },
+                    package: this.state.recommendedPackage,
+                    selections: this.state.selections
+                };
+
+                const confirmationHTML = `
+                    <div class="package-details">
+                        <h3>Order Confirmation</h3>
+                        <p><strong>Name:</strong> ${name}</p>
+                        <p><strong>Email:</strong> ${email}</p>
+                        <p><strong>Phone:</strong> ${phone}</p>
+                        <p><strong>Address:</strong> ${address}</p>
+                        <h4>Package: ${this.state.recommendedPackage.name}</h4>
+                    </div>
+                `;
+
+                this.addMessage({
+                    type: 'bot',
+                    text: 'Thank you for your order! Here\'s your confirmation:',
+                    html: confirmationHTML
+                });
+
+                setTimeout(() => {
+                    this.addMessage({
+                        type: 'bot',
+                        text: 'You will receive an email confirmation shortly. Would you like to start a new consultation?',
+                        options: ['Start New Consultation']
+                    });
+                }, 1000);
+
+                // In a real application, you would send this order to a backend server
+                console.log('Order submitted:', order);
+            }
+
+            restart() {
+                this.state = {
+                    currentCategory: null,
+                    currentConcern: null,
+                    currentQuestion: 0,
+                    selections: [],
+                    score: 0,
+                    recommendedPackage: null,
+                    conversation: []
+                };
+
+                document.getElementById('chat-messages').innerHTML = '';
+                this.init();
+            }
+
+            addMessage(message) {
+                const messagesDiv = document.getElementById('chat-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.type}-message`;
+
+                if (message.text) {
+                    messageDiv.textContent = message.text;
+                }
+
+                if (message.html) {
+                    messageDiv.innerHTML += message.html;
+                }
+
+                if (message.options) {
+                    messageDiv.classList.add('with-options');
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.className = 'options-container';
+
+                    message.options.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'option-btn';
+                        button.textContent = option;
+                        button.onclick = () => {
+                            if (option === 'Start New Consultation') {
+                                this.restart();
+                            } else if (Object.keys(chatbotData.categories).includes(option)) {
+                                this.handleCategorySelection(option);
+                            } else if (Object.keys(chatbotData.categories[this.state.currentCategory] || {}).includes(option)) {
+                                this.handleConcernSelection(option);
+                            } else if (option === 'Yes, proceed to order') {
+                                this.showOrderForm();
+                            } else if (option === 'No, start over') {
+                                this.restart();
+                            } else {
+                                this.handleAnswer(option);
+                            }
+                        };
+                        optionsContainer.appendChild(button);
+                    });
+
+                    if (message.multiple) {
+                        const nextButton = document.createElement('button');
+                        nextButton.className = 'option-btn';
+                        nextButton.textContent = 'Continue';
+                        nextButton.onclick = () => this.moveToNextQuestion();
+                        optionsContainer.appendChild(nextButton);
+                    }
+
+                    messageDiv.appendChild(optionsContainer);
+                }
+
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+
+        // Initialize ChatBot
+        const chatBot = new ChatBot();
+    </script>
+</body>
+
+</html>
+"
