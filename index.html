@@ -413,6 +413,85 @@
                                 ]
                             }
                         }
+                    },
+                    "Hyperpigmentation": {
+                        "questions": [
+                            {
+                                "text": "How long have you had your dark spots?",
+                                "options": [
+                                    { "text": "Recent (1-3 months)", "score": 1 },
+                                    { "text": "Moderate (3-12 months)", "score": 2 },
+                                    { "text": "Long-term (over 1 year)", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "What is the cause of your hyperpigmentation? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Sun damage", "score": 1 },
+                                    { "text": "Post-inflammatory", "score": 2 },
+                                    { "text": "Hormonal (melasma)", "score": 2 },
+                                    { "text": "Age spots", "score": 1 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Brightening Essentials Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Vitamin C Serum 10%",
+                                        "usage": "Apply every morning",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Alpha Arbutin 2%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Brightening System",
+                                "medicines": [
+                                    {
+                                        "name": "Kojic Acid Cream 2%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Tranexamic Acid 5%",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Niacinamide Serum 10%",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Brightening Regiment",
+                                "medicines": [
+                                    {
+                                        "name": "Hydroquinone 4%",
+                                        "usage": "Apply twice daily to dark spots",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Azelaic Acid 20%",
+                                        "usage": "Apply every evening",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Vitamin C 20% + Ferulic Acid",
+                                        "usage": "Apply every morning",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
                     }
                 },
                 "Hair Concerns": {
@@ -484,6 +563,486 @@
                                         "name": "Zinc Pyrithione Shampoo",
                                         "usage": "Alternate with medicated shampoo",
                                         "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "Hair Loss": {
+                        "questions": [
+                            {
+                                "text": "How would you describe your hair loss pattern?",
+                                "options": [
+                                    { "text": "Mild thinning", "score": 1 },
+                                    { "text": "Noticeable patches", "score": 2 },
+                                    { "text": "Significant overall loss", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "What associated symptoms do you have? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Scalp irritation", "score": 1 },
+                                    { "text": "Excessive shedding", "score": 2 },
+                                    { "text": "Scalp visibility", "score": 2 },
+                                    { "text": "Receding hairline", "score": 1 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Hair Growth Essentials",
+                                "medicines": [
+                                    {
+                                        "name": "Minoxidil Solution 2%",
+                                        "usage": "Apply twice daily to affected areas",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Biotin Supplement 5000mcg",
+                                        "usage": "Take one daily",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Hair Restoration Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Minoxidil Solution 5%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Ketoconazole Shampoo 2%",
+                                        "usage": "Use 2-3 times per week",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Hair Growth Supplement Complex",
+                                        "usage": "Take twice daily",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Hair Treatment System",
+                                "medicines": [
+                                    {
+                                        "name": "Finasteride 1mg",
+                                        "usage": "Take one tablet daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Minoxidil + Finasteride Topical Solution",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Peptide Hair Serum",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "Body Concerns": {
+                    "Eczema": {
+                        "questions": [
+                            {
+                                "text": "How severe is your eczema?",
+                                "options": [
+                                    { "text": "Mild - Occasional dry patches", "score": 1 },
+                                    { "text": "Moderate - Frequent flare-ups", "score": 2 },
+                                    { "text": "Severe - Constant irritation", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "What triggers your eczema? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Stress", "score": 1 },
+                                    { "text": "Weather changes", "score": 1 },
+                                    { "text": "Allergens", "score": 2 },
+                                    { "text": "Certain fabrics", "score": 1 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Basic Eczema Relief Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Hydrocortisone Cream 1%",
+                                        "usage": "Apply twice daily to affected areas",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Ceramide Moisturizer",
+                                        "usage": "Apply liberally as needed",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Eczema Treatment",
+                                "medicines": [
+                                    {
+                                        "name": "Triamcinolone Cream 0.1%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Colloidal Oatmeal Lotion",
+                                        "usage": "Apply 2-3 times daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Barrier Repair Cream",
+                                        "usage": "Apply after bathing",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Eczema Management System",
+                                "medicines": [
+                                    {
+                                        "name": "Tacrolimus Ointment 0.1%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Betamethasone Cream 0.05%",
+                                        "usage": "Apply during flare-ups",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Prescription Antihistamine",
+                                        "usage": "Take as directed",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "Psoriasis": {
+                        "questions": [
+                            {
+                                "text": "How extensive are your psoriasis patches?",
+                                "options": [
+                                    { "text": "Limited - Small isolated patches", "score": 1 },
+                                    { "text": "Moderate - Multiple areas affected", "score": 2 },
+                                    { "text": "Extensive - Large body areas involved", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "What symptoms bother you most? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Scaling and flaking", "score": 1 },
+                                    { "text": "Itching", "score": 1 },
+                                    { "text": "Pain or burning", "score": 2 },
+                                    { "text": "Joint pain", "score": 2 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Basic Psoriasis Care Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Coal Tar Shampoo 2%",
+                                        "usage": "Use 2-3 times per week",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Salicylic Acid Ointment 3%",
+                                        "usage": "Apply twice daily to affected areas",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Psoriasis Treatment",
+                                "medicines": [
+                                    {
+                                        "name": "Calcipotriene Cream 0.005%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Betamethasone Dipropionate 0.05%",
+                                        "usage": "Apply as directed",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Moisturizing Therapy Cream",
+                                        "usage": "Apply liberally after bathing",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Psoriasis Management",
+                                "medicines": [
+                                    {
+                                        "name": "Tazarotene Cream 0.1%",
+                                        "usage": "Apply once daily at bedtime",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Vitamin D3 Analog Ointment",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Systemic Treatment (as prescribed)",
+                                        "usage": "Take as directed by physician",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "Aging Concerns": {
+                    "Fine Lines & Wrinkles": {
+                        "questions": [
+                            {
+                                "text": "How would you describe your skin aging concerns?",
+                                "options": [
+                                    { "text": "Early signs - Fine lines", "score": 1 },
+                                    { "text": "Moderate - Visible wrinkles", "score": 2 },
+                                    { "text": "Advanced - Deep wrinkles", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "Which areas concern you most? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Crow's feet", "score": 1 },
+                                    { "text": "Forehead lines", "score": 1 },
+                                    { "text": "Nasolabial folds", "score": 2 },
+                                    { "text": "Neck wrinkles", "score": 2 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Anti-Aging Essentials",
+                                "medicines": [
+                                    {
+                                        "name": "Retinol Cream 0.25%",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Peptide Complex Serum",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Anti-Aging System",
+                                "medicines": [
+                                    {
+                                        "name": "Retinol 0.5% + Bakuchiol",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Growth Factors Serum",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Ceramide Night Cream",
+                                        "usage": "Apply every evening",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Anti-Aging Regiment",
+                                "medicines": [
+                                    {
+                                        "name": "Tretinoin 0.05%",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Stem Cell Complex",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Triple Peptide Solution",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "Loss of Firmness": {
+                        "questions": [
+                            {
+                                "text": "How would you rate your skin's loss of firmness?",
+                                "options": [
+                                    { "text": "Mild - Slight sagging", "score": 1 },
+                                    { "text": "Moderate - Noticeable loss of elasticity", "score": 2 },
+                                    { "text": "Severe - Significant sagging", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "Which areas show the most loss of firmness? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Cheeks", "score": 1 },
+                                    { "text": "Jawline", "score": 2 },
+                                    { "text": "Neck", "score": 2 },
+                                    { "text": "Under-eye area", "score": 1 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Firming Basics Kit",
+                                "medicines": [
+                                    {
+                                        "name": "Collagen Boosting Serum",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Firming Moisturizer",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Firming System",
+                                "medicines": [
+                                    {
+                                        "name": "Peptide Lift Concentrate",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Retinol + Peptides Night Cream",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Neck Firming Complex",
+                                        "usage": "Apply twice daily to neck and décolleté",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Firming Treatment",
+                                "medicines": [
+                                    {
+                                        "name": "Growth Factors + Peptides Serum",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Intensive Lifting Cream",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Retinol 1% + Firming Complex",
+                                        "usage": "Apply nightly",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "Sensitive Skin": {
+                    "Rosacea": {
+                        "questions": [
+                            {
+                                "text": "How would you describe your rosacea symptoms?",
+                                "options": [
+                                    { "text": "Mild - Occasional redness", "score": 1 },
+                                    { "text": "Moderate - Persistent redness with bumps", "score": 2 },
+                                    { "text": "Severe - Intense redness with papules", "score": 3 }
+                                ]
+                            },
+                            {
+                                "text": "What triggers affect your rosacea? (Select all that apply)",
+                                "multiple": true,
+                                "options": [
+                                    { "text": "Sun exposure", "score": 1 },
+                                    { "text": "Hot weather", "score": 1 },
+                                    { "text": "Spicy foods", "score": 1 },
+                                    { "text": "Skincare products", "score": 2 }
+                                ]
+                            }
+                        ],
+                        "packages": {
+                            "1-2": {
+                                "name": "Gentle Rosacea Care",
+                                "medicines": [
+                                    {
+                                        "name": "Azelaic Acid 10% Serum",
+                                        "usage": "Apply once daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Centella Calming Cream",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "3-4": {
+                                "name": "Advanced Rosacea Treatment",
+                                "medicines": [
+                                    {
+                                        "name": "Metronidazole Cream 0.75%",
+                                        "usage": "Apply twice daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Niacinamide 5% Serum",
+                                        "usage": "Apply morning and night",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Green Tea Complex",
+                                        "usage": "Apply as needed for calming",
+                                        "duration": "1 month supply"
+                                    }
+                                ]
+                            },
+                            "5+": {
+                                "name": "Professional Rosacea System",
+                                "medicines": [
+                                    {
+                                        "name": "Ivermectin Cream 1%",
+                                        "usage": "Apply once daily",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "Brimonidine Gel 0.33%",
+                                        "usage": "Apply thin layer in morning",
+                                        "duration": "1 month supply"
+                                    },
+                                    {
+                                        "name": "LED Light Therapy Device",
+                                        "usage": "Use for 3 minutes daily",
+                                        "duration": "Permanent device"
                                     }
                                 ]
                             }
@@ -783,7 +1342,18 @@
                         nextButton.textContent = 'Continue';
                         nextButton.onclick = () => this.moveToNextQuestion();
                         optionsContainer.appendChild(nextButton);
+
+                        // The following line was incorrect and unnecessary.  It was assigning the string 'Continue' to the textContent property, not checking it.
+                        // if nextButton.textContent = 'Continue'; 
+
+                        // Correct way to check the text and set the background color:
+                        if (nextButton.textContent === 'Continue') {  // Use === for comparison
+                            nextButton.style.backgroundColor = '#1F8CE9'; // Or any other blue color you prefer (e.g., '#007bff')
+                            // Optionally, set the text color to white for better contrast:
+                            nextButton.style.color = 'white';
+                        }
                     }
+
 
                     messageDiv.appendChild(optionsContainer);
                 }
