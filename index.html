@@ -431,8 +431,17 @@
     <a href="https://example.com/purchase" class="cta-button" id="cta-button">Buy Now</a>
 
     <script>
+        // JSON Data Structure
         const chatbotData = {
             "initial_questions": [
+                {
+                    "text": "What are your hair concerns? (Select all that apply)",
+                    "field": "concerns",
+                    "type": "multiple_choice",
+                    "options": ["Hairfall", "Dandruff", "Lice", "Split ends/Damaged or Dull Hair", "Premature Greying"]
+                }
+            ],
+            "user_info_questions": [
                 {
                     "text": "What's your Name?",
                     "field": "name",
@@ -466,14 +475,9 @@
                     "type": "number",
                     "validation": "^[0-9]{1,3}$",
                     "errorMessage": "Please enter a valid age between 0-150"
-                },
-                {
-                    "text": "What's your major hair concern?",
-                    "field": "concern",
-                    "type": "single_choice",
-                    "options": ["Hairfall", "Dandruff", "Lice", "Split ends/Damaged or Dull Hair", "Premature Greying"]
                 }
-            ], "concern_flows": {
+            ],
+            "concern_flows": {
                 "Hairfall": {
                     "questions": [
                         {
@@ -537,7 +541,8 @@
                     }
                 },
                 "Lice": {
-                    "questions": [], "recommendations": {
+                    "questions": [],
+                    "recommendations": {
                         "default": {
                             "name": "Anti-Lice Treatment Package",
                             "packageLink": "https://example.com/packages/lice-treatment",
@@ -634,11 +639,17 @@
             }
         };
 
+        // Chatbot Class Implementation
         class ChatBot {
             constructor() {
-                this.userData = {};
+                this.userData = {
+                    concerns: []
+                };
                 this.currentStep = 0;
-                this.conversationType = 'initial';
+                this.conversationType = 'initial'; // initial -> concern -> user_info
+                this.concernQueue = []; // Queue to process multiple concerns
+                this.currentConcern = null; // Currently processing concern
+                this.recommendationResults = []; // Store all recommendations
                 this.init();
             }
 
@@ -648,7 +659,7 @@
             }
 
             showWelcome() {
-                this.addBotMessage("Welcome! Let's find the right hair care solution for you.");
+                this.addBotMessage("Welcome! Let's find the right hair care solutions for you.");
             }
 
             validateInput(value, type, validation) {
@@ -675,7 +686,9 @@
             askInitialQuestions() {
                 if (this.currentStep < chatbotData.initial_questions.length) {
                     const question = chatbotData.initial_questions[this.currentStep];
-                    if (question.type === 'single_choice' && question.options) {
+                    if (question.type === 'multiple_choice' && question.options) {
+                        this.addBotMessage(question.text, false, null, question.options, null, true);
+                    } else if (question.type === 'single_choice' && question.options) {
                         this.addBotMessage(question.text, false, null, question.options);
                     } else {
                         this.addBotMessage(question.text, true, question.type);
@@ -684,7 +697,13 @@
             }
 
             handleTextInput(value) {
-                const currentQuestion = chatbotData.initial_questions[this.currentStep];
+                let currentQuestion;
+
+                if (this.conversationType === 'initial') {
+                    currentQuestion = chatbotData.initial_questions[this.currentStep];
+                } else if (this.conversationType === 'user_info') {
+                    currentQuestion = chatbotData.user_info_questions[this.currentStep];
+                }
 
                 if (!this.validateInput(value, currentQuestion.type, currentQuestion.validation)) {
                     this.showError(currentQuestion.errorMessage || "Please provide a valid input");
@@ -695,16 +714,40 @@
                 this.addUserMessage(value);
                 this.currentStep++;
 
-                if (this.currentStep < chatbotData.initial_questions.length) {
-                    setTimeout(() => this.askInitialQuestions(), 500);
-                } else {
-                    this.conversationType = 'concern';
-                    setTimeout(() => this.startConcernFlow(), 1000);
+                if (this.conversationType === 'initial') {
+                    if (this.currentStep < chatbotData.initial_questions.length) {
+                        setTimeout(() => this.askInitialQuestions(), 500);
+                    } else {
+                        this.addBotMessage("Processing your selections...");
+                        setTimeout(() => this.processNextConcern(), 1000);
+                    }
+                } else if (this.conversationType === 'user_info') {
+                    if (this.currentStep < chatbotData.user_info_questions.length) {
+                        setTimeout(() => this.askUserInfoQuestions(), 500);
+                    } else {
+                        setTimeout(() => this.showAllRecommendations(), 1000);
+                    }
                 }
+
                 return true;
             }
 
-            handleOptionSelect(option) {
+            handleOptionSelect(option, isMultipleChoice = false, selectedOptions = []) {
+                if (isMultipleChoice) {
+                    // For multiple choice, we handle the selected array directly
+                    this.addUserMessage("Selected concerns: " + selectedOptions.join(", "));
+                    this.userData.concerns = selectedOptions;
+                    this.concernQueue = [...selectedOptions]; // Copy the array to queue
+
+                    this.currentStep++;
+                    this.conversationType = 'concern';
+
+                    // Process the first concern
+                    setTimeout(() => this.processNextConcern(), 1000);
+                    return;
+                }
+
+                // Single option selection handling
                 this.addUserMessage(option);
 
                 if (this.conversationType === 'initial') {
@@ -716,26 +759,55 @@
                         setTimeout(() => this.askInitialQuestions(), 500);
                     } else {
                         this.conversationType = 'concern';
-                        setTimeout(() => this.startConcernFlow(), 1000);
+                        setTimeout(() => this.processNextConcern(), 1000);
                     }
-                } else {
+                } else if (this.conversationType === 'concern') {
                     this.userData.lastAnswer = option;
                     this.flowStep++;
 
                     if (this.currentFlow.questions && this.flowStep < this.currentFlow.questions.length) {
                         setTimeout(() => this.askConcernQuestion(), 500);
                     } else {
-                        setTimeout(() => this.showRecommendation(option), 1000);
+                        // Store this recommendation result and proceed to next concern
+                        this.storeRecommendation(option);
+                        setTimeout(() => this.processNextConcern(), 1000);
+                    }
+                } else if (this.conversationType === 'user_info') {
+                    const currentQuestion = chatbotData.user_info_questions[this.currentStep];
+                    this.userData[currentQuestion.field] = option;
+                    this.currentStep++;
+
+                    if (this.currentStep < chatbotData.user_info_questions.length) {
+                        setTimeout(() => this.askUserInfoQuestions(), 500);
+                    } else {
+                        setTimeout(() => this.showAllRecommendations(), 1000);
                     }
                 }
             }
 
-            startConcernFlow() {
-                const concern = this.userData.concern;
+            processNextConcern() {
+                // If we have more concerns to process
+                if (this.concernQueue.length > 0) {
+                    this.currentConcern = this.concernQueue.shift();
+                    this.startConcernFlow(this.currentConcern);
+                } else {
+                    // All concerns processed, move to user info
+                    this.conversationType = 'user_info';
+                    this.currentStep = 0;
+
+                    // Add a transition message
+                    this.addBotMessage(`Great! We've identified ${this.recommendationResults.length} solutions for your concerns. Before showing our recommendations, please provide some information about yourself.`);
+
+                    setTimeout(() => this.askUserInfoQuestions(), 1000);
+                }
+            }
+
+            startConcernFlow(concern) {
                 const concernFlow = chatbotData.concern_flows[concern];
 
                 if (!concernFlow) {
-                    this.showError("Sorry, we couldn't process your concern.");
+                    this.showError(`Sorry, we couldn't process your "${concern}" concern.`);
+                    this.processNextConcern(); // Skip to next concern
                     return;
                 }
 
@@ -743,32 +815,17 @@
                 this.flowStep = 0;
 
                 if (concernFlow.questions && concernFlow.questions.length > 0) {
+                    this.addBotMessage(`Let's gather more information about your "${concern}" concern:`);
                     this.askConcernQuestion();
                 } else {
-                    this.showRecommendation('default');
+                    // For concerns without questions (like Lice), store default as key
+                    this.storeRecommendation('default');
+                    this.processNextConcern();
                 }
             }
 
-            askConcernQuestion() {
-                const question = this.currentFlow.questions[this.flowStep];
-                if (!question) {
-                    this.showRecommendation(this.userData.lastAnswer || 'default');
-                    return;
-                }
-
-                if (question.condition && this.userData.lastAnswer !== question.condition) {
-                    this.flowStep++;
-                    if (this.flowStep < this.currentFlow.questions.length) {
-                        this.askConcernQuestion();
-                    } else {
-                        this.showRecommendation(this.userData.lastAnswer);
-                    }
-                    return;
-                }
-                this.addBotMessage(question.question, false, null, question.options);
-            }
-
-            showRecommendation(key) {
+            storeRecommendation(key) {
+                const concern = this.currentConcern;
                 const recommendations = this.currentFlow.recommendations;
                 let recommendation;
 
@@ -780,47 +837,107 @@
                     recommendation = Object.values(recommendations)[0];
                 }
 
-                if (!recommendation) {
-                    this.showError("Sorry, we couldn't find a recommendation for your condition.");
+                if (recommendation) {
+                    this.recommendationResults.push({
+                        concern: concern,
+                        key: key,
+                        recommendation: recommendation
+                    });
+                }
+            }
+
+            askConcernQuestion() {
+                const question = this.currentFlow.questions[this.flowStep];
+                if (!question) {
+                    this.storeRecommendation(this.userData.lastAnswer || 'default');
+                    this.processNextConcern();
                     return;
                 }
 
+                if (question.condition && this.userData.lastAnswer !== question.condition) {
+                    this.flowStep++;
+                    if (this.flowStep < this.currentFlow.questions.length) {
+                        this.askConcernQuestion();
+                    } else {
+                        this.storeRecommendation(this.userData.lastAnswer);
+                        this.processNextConcern();
+                    }
+                    return;
+                }
+                this.addBotMessage(question.question, false, null, question.options);
+            }
+
+            askUserInfoQuestions() {
+                if (this.currentStep < chatbotData.user_info_questions.length) {
+                    const question = chatbotData.user_info_questions[this.currentStep];
+                    if (question.type === 'single_choice' && question.options) {
+                        this.addBotMessage(question.text, false, null, question.options);
+                    } else {
+                        this.addBotMessage(question.text, true, question.type);
+                    }
+                }
+            }
+
+            showAllRecommendations() {
+                if (this.recommendationResults.length === 0) {
+                    this.addBotMessage("Sorry, we couldn't find any recommendations for your concerns.");
+                    return;
+                }
+
+                // Thank the user first
+                this.addBotMessage(`Thank you, ${this.userData.name}! Here are your personalized recommendations:`);
+
+                // Display each recommendation
+                this.recommendationResults.forEach((result, index) => {
+                    setTimeout(() => {
+                        this.addBotMessage(`Recommendation for "${result.concern}":`);
+                        this.showSingleRecommendation(result.recommendation);
+                    }, index * 1000); // Stagger the display of recommendations
+                });
+
+                // Add a follow-up message after all recommendations
+                setTimeout(() => {
+                    this.addBotMessage("Thank you for using our hair consultation service. If you have any questions about your recommendations, feel free to contact our support team!");
+                }, (this.recommendationResults.length + 1) * 1000);
+            }
+
+            showSingleRecommendation(recommendation) {
                 const html = `
-                    <div class="recommendation">
-                        <div class="recommendation-header">
-                            <h3 class="recommendation-title">${recommendation.name}</h3>
-                        </div>
-                        
-                        <img src="${recommendation.image}" 
-                             alt="${recommendation.name}" 
-                             class="recommendation-image">
-                        
-                        <div class="recommendation-products">
-                            <h4 class="recommendation-products-title">Package Includes:</h4>
-                            <ul class="product-list">
-                                ${recommendation.products.map(product => `
-                                    <li class="product-item">
-                                        <div class="product-icon">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M20 12v10H4V12M22 7H2v5h20V7zM12 7V3h0v4M8 3h8"/>
-                                            </svg>
-                                        </div>
-                                        <span class="product-name">${product}</span>
-                                    </li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="recommendation-footer">
-                            <div class="package-info">
-                                Complete Hair Care Solution Package
-                            </div>
-                            <a href="${recommendation.packageLink}" class="buy-now-btn">
-                                Buy Package Now
-                            </a>
-                        </div>
+            <div class="recommendation">
+                <div class="recommendation-header">
+                    <h3 class="recommendation-title">${recommendation.name}</h3>
+                </div>
+                
+                <img src="${recommendation.image}" 
+                     alt="${recommendation.name}" 
+                     class="recommendation-image">
+                
+                <div class="recommendation-products">
+                    <h4 class="recommendation-products-title">Package Includes:</h4>
+                    <ul class="product-list">
+                        ${recommendation.products.map(product => `
+                            <li class="product-item">
+                                <div class="product-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 12v10H4V12M22 7H2v5h20V7zM12 7V3h0v4M8 3h8"/>
+                                    </svg>
+                                </div>
+                                <span class="product-name">${product}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+                
+                <div class="recommendation-footer">
+                    <div class="package-info">
+                        Complete Hair Care Solution Package
                     </div>
-                `;
+                    <a href="${recommendation.packageLink}" class="buy-now-btn">
+                        Buy Package Now
+                    </a>
+                </div>
+            </div>
+        `;
 
                 this.addBotMessage(null, false, null, null, html);
             }
@@ -835,7 +952,7 @@
                 setTimeout(() => errorDiv.remove(), 3000);
             }
 
-            addBotMessage(text, showInput = false, inputType = null, options = null, html = null) {
+            addBotMessage(text, showInput = false, inputType = null, options = null, html = null, isMultipleChoice = false) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message bot-message';
 
@@ -907,21 +1024,80 @@
                 }
 
                 if (options) {
-                    const optionsContainer = document.createElement('div');
-                    optionsContainer.className = 'options-container';
+                    if (isMultipleChoice) {
+                        // Create a multi-select UI
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'multi-options-container';
 
-                    options.forEach(option => {
-                        const button = document.createElement('button');
-                        button.className = 'option-btn';
-                        button.textContent = option;
-                        button.onclick = () => {
-                            this.handleOptionSelect(option);
-                            optionsContainer.remove();
+                        const selectedOptions = [];
+
+                        options.forEach(option => {
+                            const optionContainer = document.createElement('div');
+                            optionContainer.className = 'multi-option-item';
+
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = `option-${option.replace(/\s+/g, '-').toLowerCase()}`;
+                            checkbox.value = option;
+                            checkbox.className = 'multi-option-checkbox';
+
+                            checkbox.onchange = () => {
+                                if (checkbox.checked) {
+                                    selectedOptions.push(option);
+                                } else {
+                                    const index = selectedOptions.indexOf(option);
+                                    if (index > -1) {
+                                        selectedOptions.splice(index, 1);
+                                    }
+                                }
+
+                                // Enable/disable submit button based on selection
+                                submitButton.disabled = selectedOptions.length === 0;
+                            };
+
+                            const label = document.createElement('label');
+                            label.htmlFor = checkbox.id;
+                            label.textContent = option;
+                            label.className = 'multi-option-label';
+
+                            optionContainer.appendChild(checkbox);
+                            optionContainer.appendChild(label);
+                            optionsContainer.appendChild(optionContainer);
+                        });
+
+                        // Add a submit button for multiple selections
+                        const submitButton = document.createElement('button');
+                        submitButton.className = 'multi-option-submit-btn';
+                        submitButton.textContent = 'Continue with Selected Concerns';
+                        submitButton.disabled = true; // Initially disabled until at least one option is selected
+
+                        submitButton.onclick = () => {
+                            if (selectedOptions.length > 0) {
+                                this.handleOptionSelect(null, true, selectedOptions);
+                                optionsContainer.remove();
+                            }
                         };
-                        optionsContainer.appendChild(button);
-                    });
 
-                    messageDiv.appendChild(optionsContainer);
+                        optionsContainer.appendChild(submitButton);
+                        messageDiv.appendChild(optionsContainer);
+                    } else {
+                        // Regular single-choice options
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'options-container';
+
+                        options.forEach(option => {
+                            const button = document.createElement('button');
+                            button.className = 'option-btn';
+                            button.textContent = option;
+                            button.onclick = () => {
+                                this.handleOptionSelect(option);
+                                optionsContainer.remove();
+                            };
+                            optionsContainer.appendChild(button);
+                        });
+
+                        messageDiv.appendChild(optionsContainer);
+                    }
                 }
 
                 document.getElementById('chat-messages').appendChild(messageDiv);
@@ -944,6 +1120,72 @@
 
         // Initialize ChatBot when the document is loaded
         document.addEventListener('DOMContentLoaded', () => {
+            // Add CSS for multi-select options
+            const styleSheet = document.createElement("style");
+            styleSheet.textContent = `
+    .multi-options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    .multi-option-item {
+        display: flex;
+        color: black;
+        align-items: center;
+        padding: 8px 12px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .multi-option-item:hover {
+        background-color: #e9ecef;
+    }
+    
+    .multi-option-checkbox {
+        margin-right: 10px;
+    }
+    
+    .multi-option-label {
+        flex: 1;
+        cursor: pointer;
+    }
+    
+    .multi-option-submit-btn {
+        margin-top: 15px;
+        padding: 10px 15px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        align-self: center;
+        width: 100%;
+    }
+    
+    .multi-option-submit-btn:hover {
+        background-color: #3e8e41;
+    }
+    
+    .multi-option-submit-btn:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    .recommendation {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    `;
+            document.head.appendChild(styleSheet);
+
             const chatBot = new ChatBot();
         });
     </script>
